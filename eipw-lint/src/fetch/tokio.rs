@@ -24,6 +24,7 @@ impl Fetch for Tokio {
         &self,
         _path: PathBuf,
     ) -> Pin<Box<dyn Future<Output = Result<String, std::io::Error>>>> {
-        todo!()
+        let fut = async { Err(std::io::ErrorKind::Unsupported.into()) };
+        Box::pin(fut)
     }
 }
