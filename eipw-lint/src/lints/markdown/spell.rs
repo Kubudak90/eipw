@@ -235,8 +235,10 @@ impl<'a, 'b, 'c> TextFind<'a, 'b, 'c> {
             }
         };
 
-        let start = node_offset + line_offset;
-        let end = start + mistake.misspelling.len();
+        let start_byte = node_offset + line_offset;
+        let end_byte = start_byte + mistake.misspelling.len();
+        let char_start = source[..start_byte].chars().count();
+        let char_end = source[..end_byte].chars().count();
 
         let label = format!("the word `{}` is misspelled", mistake.misspelling);
         self.ctx.report(
@@ -251,7 +253,7 @@ impl<'a, 'b, 'c> TextFind<'a, 'b, 'c> {
                         .annotation(
                             self.ctx
                                 .annotation_level()
-                                .span(start..end)
+                                .span(char_start..char_end)
                                 .label("incorrectly spelled"),
                         ),
                 ),
