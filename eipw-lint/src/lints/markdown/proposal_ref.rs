@@ -80,8 +80,9 @@ impl Lint for ProposalRef {
 
             let source = ctx.ast_lines(&ast);
             let annotations = source.match_indices(&text).map(|(start, _)| {
-                let end = start + text.len();
-                ctx.annotation_level().span(start..end)
+                let char_start = source[..start].chars().count();
+                let char_end = char_start + text.chars().count();
+                ctx.annotation_level().span(char_start..char_end)
             });
 
             ctx.report(
