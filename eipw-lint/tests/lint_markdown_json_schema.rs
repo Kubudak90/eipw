@@ -264,3 +264,45 @@ header: value1
 
     assert_eq!(reports, "");
 }
+
+#[tokio::test]
+async fn non_ascii_characters() {
+    let src = r#"---
+header: value1
+---
+
+```hello
+{"message": "héllo wörld 你好"}
+```
+"#;
+
+    let reports = Linter::<Text<String>>::default()
+        .clear_lints()
+        .deny(
+            "markdown-json-schema",
+            JsonSchema {
+                language: "hello",
+                additional_schemas: vec![],
+                help: "see https://example.com/schema.json",
+                schema: r#"{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Root",
+    "type": "object",
+    "required": ["count"],
+    "properties": {
+        "count": { "type": "integer" }
+    }
+}"#,
+            },
+        )
+        .check_slice(None, src)
+        .run()
+        .await
+        .unwrap()
+        .into_inner();
+
+    // This test verifies that non-ASCII characters in JSON code blocks
+    // do not cause a panic. The span should use byte length, not character count.
+    assert!(reports.contains("markdown-json-schema"));
+    assert!(reports.contains("does not conform to required schema"));
+}
