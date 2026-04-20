@@ -87,8 +87,9 @@ impl<'a, 'b, 'c> ExcludesVisitor<'a, 'b, 'c> {
                 .re
                 .find_iter(buf)
                 .map(|m| {
-                    let start = offset + m.start();
-                    let end = offset + m.end();
+                    let char_offset = source[..offset].chars().count();
+                    let start = char_offset + buf[..m.start()].chars().count();
+                    let end = char_offset + buf[..m.end()].chars().count();
                     self.ctx.annotation_level().span(start..end)
                 })
                 .collect(),

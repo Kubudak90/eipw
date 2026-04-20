@@ -100,8 +100,10 @@ impl<'a, 'b, 'c> Visitor<'a, 'b, 'c> {
             let annotations = match offset {
                 None => None,
                 Some(offset) => {
-                    let start = offset + matched.get(0).unwrap().start();
-                    let end = offset + matched.get(0).unwrap().end();
+                    let char_offset = source[..offset].chars().count();
+                    let m = matched.get(0).unwrap();
+                    let start = char_offset + text[..m.start()].chars().count();
+                    let end = char_offset + text[..m.end()].chars().count();
                     Some(self.ctx.annotation_level().span(start..end))
                 }
             };
