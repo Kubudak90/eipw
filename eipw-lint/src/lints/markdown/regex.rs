@@ -151,6 +151,12 @@ impl<'a, 'b, 'c> tree::Visitor for ExcludesVisitor<'a, 'b, 'c> {
     }
 
     fn enter_link(&mut self, ast: &Ast, link: &NodeLink) -> Result<Next, Self::Error> {
+        // Autolinks like <https://example.com> should not have their URL text
+        // checked by the regex linter. The URL itself is not user-facing text
+        // and should not trigger pattern violations.
+        if link.title.is_empty() && !link.url.is_empty() {
+            return Ok(Next::TraverseChildren);
+        }
         self.check(ast, &link.title)
     }
 
