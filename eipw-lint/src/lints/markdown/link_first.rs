@@ -78,10 +78,7 @@ impl<'a, 'b, 'c> Visitor<'a, 'b, 'c> {
                 None => false,
                 Some(own_number) => matched
                     .get(1)
-                    .expect("missing capture group for `LinkFirst` regex")
-                    .as_str()
-                    .parse()
-                    .map(|n: u32| n == own_number)
+                    .map(|m| m.as_str().parse().map(|n: u32| n == own_number).unwrap_or(false))
                     .unwrap_or(false),
             };
 

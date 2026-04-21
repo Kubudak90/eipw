@@ -140,3 +140,24 @@ EIP-1234
 
     assert_eq!(reports, "");
 }
+
+#[tokio::test]
+async fn no_capture_group_with_eip_header() {
+    // Regression test: pattern without capture group + eip header used to panic
+    let src = r#"---
+eip: 1234
+---
+hello
+"#;
+
+    let reports = Linter::<Text<String>>::default()
+        .clear_lints()
+        .deny("markdown-link-first", LinkFirst("ello"))
+        .check_slice(None, src)
+        .run()
+        .await
+        .unwrap()
+        .into_inner();
+
+    assert_ne!(reports, "");
+}
